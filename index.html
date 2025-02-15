@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Space Invaders</title>
+
+    <!-- Custom Bangers font css links -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="controls">
+        <button id="fullScreenButton">F</button>
+        <button id="resetButton">R</button>
+    </div>
+
+    <div class="assets">
+        <img id="crew" src="images/crew.png">
+        <img id="crewSprite" src="images/crewSprite.png">
+        <img id="beetlemorph" src="images/beetlemorph.png">
+        <img id="lobstermorph" src="images/lobstermorph.png">
+    </div>
+
+    <script src="src/enemy.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
