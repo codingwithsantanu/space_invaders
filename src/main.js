@@ -153,7 +153,7 @@ class Game {
             this.handleEnemies(dt);
 
             for (let i = this.enemies.length - 1; i >= 0; i--) {
-                this.enemies[i].update();
+                this.enemies[i].update(dt);
             }
 
             this.enemies.forEach(enemy => {
@@ -228,12 +228,14 @@ class Game {
     // Helper methods for better modularity.
     createEnemies() {
         for (let i = 0; i < this.numberOfEnemies; i++) {
-            const randomNumber = Math.random();
-            if (randomNumber < 0.6) {
-                this.enemies.push(new BeetleMorph(this));
-            } else {
-                this.enemies.push(new LobsterMorph(this));
-            }
+            // const randomNumber = Math.random();
+            // if (randomNumber < 0.6) {
+                //     this.enemies.push(new BeetleMorph(this));
+            // } else {
+            //     this.enemies.push(new LobsterMorph(this));
+            // }
+
+            this.enemies.push(new PhantomMorph(this));
         }
     }
 
