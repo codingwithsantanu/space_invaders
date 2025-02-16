@@ -19,8 +19,12 @@ class Game {
         this.numberOfEnemies = 10;
         this.createEnemies();
 
+        this.crewImage = document.getElementById("crew");
+
+        this.debug = false;
+
         this.score = 0;
-        this.winningScore = 3;
+        this.winningScore = 20;
         this.lives = 0;
         this.gameOver = true;
 
@@ -28,8 +32,12 @@ class Game {
         this.message2 = "Or Get Eaten!";
         this.message3 = `Press "Enter" or Click "R" To Start!`;
 
-        this.timer = 0;
-        this.interval = 1000;
+        this.enemyTimer = 0;
+        this.enemyInterval = 1000;
+
+        this.animationTimer = 0;
+        this.animationInterval = 200;
+        this.spriteUpdate = false;
 
         // Add event listeners.
         this.mouse = {
@@ -86,6 +94,8 @@ class Game {
                 } else {
                     document.exitFullscreen();
                 }
+            } else if (event.key.toLowerCase() === 'd') {
+                this.debug = !this.debug;
             }
         });
 
@@ -125,7 +135,7 @@ class Game {
         this.width = width;
         this.height = height;
 
-        this.context.font = "50px Bangers";
+        this.context.font = "30px Bangers";
         this.context.textAlign = "center";  // Aligns text horizontally.
         this.context.textBaseline = "middle"; // Aligns text vertically.
         this.context.fillStyle = "White";
@@ -134,12 +144,16 @@ class Game {
     }
 
     render(dt) {
-        // console.log(this.mouse.pressed);
+        this.handleAnimationTimer(dt);
 
         if (!this.gameOver) {
             this.handleEnemies(dt);
+
+            for (let i = this.enemies.length - 1; i >= 0; i--) {
+                this.enemies[i].update();
+            }
+
             this.enemies.forEach(enemy => {
-                enemy.update();
                 enemy.draw();
             });
         }
@@ -154,7 +168,8 @@ class Game {
         this.context.fillText(`Score: ${this.score}`, 20, 40);
 
         for (let i = 0; i < this.lives; i++) {
-            this.context.fillRect(20 + (15 * i), 60, 10, 30);
+            // this.context.fillRect(20 + (15 * i), 60, 10, 30);
+            this.context.drawImage(this.crewImage, 20 + (20 * i), 70, 15, 30);
         }
 
         if (this.lives < 1 || this.score >= this.winningScore) {
@@ -193,15 +208,15 @@ class Game {
     // Helper methods for better modularity.
     createEnemies() {
         for (let i = 0; i < this.numberOfEnemies; i++) {
-            this.enemies.push(new Enemy(this));
+            this.enemies.push(new BeetleMorph(this));
         }
     }
 
     handleEnemies(dt) {
-        if (this.timer < this.interval) {
-            this.timer += dt;
+        if (this.enemyTimer < this.enemyInterval) {
+            this.enemyTimer += dt;
         } else {
-            this.timer = 0;
+            this.enemyTimer = 0;
 
             const enemy = this.getFreeEnemy();
             if (enemy)
@@ -237,6 +252,16 @@ class Game {
                 this.message1 = "Well done!";
                 this.message2 = "You escaped the swarm!";
             }
+        }
+    }
+
+    handleAnimationTimer(dt) {
+        if (this.animationTimer < this.animationInterval) {
+            this.animationTimer += dt;
+            this.spriteUpdate = false;
+        } else {
+            this.animationTimer = 0;
+            this.spriteUpdate = true;
         }
     }
 }
