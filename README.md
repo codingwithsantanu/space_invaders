@@ -13,7 +13,7 @@ Different types of enemies behave differently and use a proper state management 
 ## Inspiration
 This project is originally a part of a YouTube tutorial presented by [@FranksLaboratory](https://codepen.io/franksLaboratory). You can view his video from this [link](https://youtu.be/6qcw5gJrLTE?si=i8f-2tz-1jMp1gav).
 
-> **NOTE**: I don't want to copy the work of someone else and put on my name in it. Rather, this project was made for learning by the original creator and is also used for learning.
+> **NOTE**: I don't want to copy the work of someone else and put on my name in it. Instead, this project was made for learning by the original creator and is also used for learning.
 
 
 <cite>Whoever read this entire `README.md` file has my respect. I hope you keep wasting your time. Just kidding, thanks :wink::heart:.</cite>
