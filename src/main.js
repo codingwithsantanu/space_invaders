@@ -232,14 +232,16 @@ class Game {
     // Helper methods for better modularity.
     createEnemies() {
         for (let i = 0; i < this.numberOfEnemies; i++) {
-            // const randomNumber = Math.random();
-            // if (randomNumber < 0.6) {
-                //     this.enemies.push(new BeetleMorph(this));
-            // } else {
-            //     this.enemies.push(new LobsterMorph(this));
-            // }
-
-            this.enemies.push(new PhantomMorph(this));
+            // this.enemies.push(new Enemy(this));
+            
+            const randomNumber = Math.random();
+            if (randomNumber <= 0.3) {
+                this.enemies.push(new BeetleMorph(this));
+            } else if (randomNumber <= 0.7) {
+                this.enemies.push(new PhantomMorph(this));
+            } else {
+                this.enemies.push(new LobsterMorph(this));
+            }
         }
     }
 
