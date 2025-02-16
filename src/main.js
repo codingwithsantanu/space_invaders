@@ -19,8 +19,6 @@ class Game {
         this.numberOfEnemies = 10;
         this.createEnemies();
 
-        this.crewImage = document.getElementById("crew");
-
         this.debug = false;
 
         this.score = 0;
@@ -36,8 +34,12 @@ class Game {
         this.enemyInterval = 1000;
 
         this.animationTimer = 0;
-        this.animationInterval = 200;
+        this.animationInterval = 120;
         this.spriteUpdate = false;
+
+        // this.crewImage = document.getElementById("crew");
+        this.crewImage = document.getElementById("crewSprite");
+        this.crewMembers = [];
 
         // Add event listeners.
         this.mouse = {
@@ -111,8 +113,9 @@ class Game {
     // Main methods for handling the game mechanics.
     start() {
         this.score = 0;
-        this.lives = 3;
+        this.lives = 5;
         this.gameOver = false;
+        this.generateCrewMembers();
 
         this.enemies.forEach(enemy => {
             enemy.reset();
@@ -169,7 +172,24 @@ class Game {
 
         for (let i = 0; i < this.lives; i++) {
             // this.context.fillRect(20 + (15 * i), 60, 10, 30);
-            this.context.drawImage(this.crewImage, 20 + (20 * i), 70, 15, 30);
+            // this.context.drawImage(this.crewImage, 20 + (20 * i), 70, 15, 30);
+            
+            const width = 20;
+            const height = 45;
+
+            this.context.drawImage(
+                this.crewImage,
+
+                width * this.crewMembers[i].frameX,
+                height * this.crewMembers[i].frameY,
+                width,
+                height,
+
+                20 + (20 * i),
+                70,
+                width,
+                height
+            );
         }
 
         if (this.lives < 1 || this.score >= this.winningScore) {
@@ -208,7 +228,12 @@ class Game {
     // Helper methods for better modularity.
     createEnemies() {
         for (let i = 0; i < this.numberOfEnemies; i++) {
-            this.enemies.push(new BeetleMorph(this));
+            const randomNumber = Math.random();
+            if (randomNumber < 0.6) {
+                this.enemies.push(new BeetleMorph(this));
+            } else {
+                this.enemies.push(new LobsterMorph(this));
+            }
         }
     }
 
@@ -262,6 +287,16 @@ class Game {
         } else {
             this.animationTimer = 0;
             this.spriteUpdate = true;
+        }
+    }
+
+    generateCrewMembers() {
+        this.crewMembers = [];
+        for (let i = 0; i < this.lives; i++) {
+            this.crewMembers.push({
+                frameX: Math.floor(Math.random() * 5),
+                frameY: Math.floor(Math.random() * 5)
+            });
         }
     }
 }

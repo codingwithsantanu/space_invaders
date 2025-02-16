@@ -22,6 +22,8 @@ class Enemy {
         this.frameX;
         this.frameY;
         this.lastFrame;
+        this.minFrame;
+        this.maxFrame;
     }
 
     // Methods for Object Pool.
@@ -132,6 +134,7 @@ class BeetleMorph extends Enemy {
         super(game);
         
         this.image = document.getElementById("beetlemorph");
+        this.lastFrame = 3;
 
         this.speedX = 0;
         this.speedY = Math.random() * 2 + 0.2;
@@ -141,7 +144,6 @@ class BeetleMorph extends Enemy {
         super.start();
 
         this.lives = 1;
-        this.lastFrame = 3;
     }
 
     update() {
@@ -152,6 +154,48 @@ class BeetleMorph extends Enemy {
 
         if (this.isAlive()) {
             this.checkCollision();
+        }
+    }
+}
+
+
+class LobsterMorph extends Enemy {
+    constructor(game) {
+        super(game);
+        
+        this.image = document.getElementById("lobstermorph");
+        this.lastFrame = 14;
+
+        this.speedX = 0;
+        this.speedY = Math.random() * 0.5 + 0.2;
+    }
+
+    start() {
+        super.start();
+
+        this.lives = 3;
+    }
+
+    update() {
+        super.update();
+
+        if (this.free)
+            return;
+
+        if (this.lives >= 3) {
+            this.maxFrame = 0;
+        } else if (this.lives >= 2) {
+            this.maxFrame = 3;
+        } else if (this.lives === 1) {
+            this.maxFrame = 7;
+        }
+
+        if (this.isAlive()) {
+            this.checkCollision();
+
+            if (this.frameX < this.maxFrame && this.game.spriteUpdate) {
+                this.frameX++;
+            }
         }
     }
 }
