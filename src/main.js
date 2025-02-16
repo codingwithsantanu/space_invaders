@@ -19,8 +19,14 @@ class Game {
         this.numberOfEnemies = 10;
         this.createEnemies();
 
-        this.score;
-        this.lives;
+        this.score = 0;
+        this.winningScore = 3;
+        this.lives = 0;
+        this.gameOver = true;
+
+        this.message1 = "RUN!";
+        this.message2 = "Or Get Eaten!";
+        this.message3 = `Press "Enter" or Click "R" To Start!`;
 
         this.timer = 0;
         this.interval = 1000;
@@ -61,18 +67,63 @@ class Game {
             this.mouse.y = event.changedTouches[0].pageY;
             this.mouse.pressed = false;
         });
+
+
+        // Add event listeners for buttons and start functionality.
+        const resetButton = document.getElementById("resetButton");
+        const fullScreenButton = document.getElementById("fullScreenButton");
+
+        resetButton.addEventListener("click", event => {
+            this.start();
+        });
+
+        window.addEventListener("keydown", event => {
+            if (event.key.toLowerCase() === 'r' || event.key === "Enter") {
+                this.start();
+            } else if (event.key === ' ' || event.key.toLowerCase() === 'f') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        fullScreenButton.addEventListener("click", event => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
     }
 
     // Main methods for handling the game mechanics.
+    start() {
+        this.score = 0;
+        this.lives = 3;
+        this.gameOver = false;
+
+        this.enemies.forEach(enemy => {
+            enemy.reset();
+            // NOTE: This resets enemies from the previous match.
+            // ....  If we skip this, enemies will stay in the same position.
+        });
+
+        for (let i = 0; i < 2; i++) {
+            const enemy = this.getFreeEnemy();
+            if (enemy) {
+                enemy.start();
+            }
+        }
+    }
+
     resize(width, height) {
         this.canvas.width = width;
         this.canvas.height = height;
 
         this.width = width;
         this.height = height;
-
-        this.score = 0;
-        this.lives = 3;
 
         this.context.font = "50px Bangers";
         this.context.textAlign = "center";  // Aligns text horizontally.
@@ -85,11 +136,57 @@ class Game {
     render(dt) {
         // console.log(this.mouse.pressed);
 
-        this.handleEnemies(dt);
-        this.enemies.forEach(enemy => {
-            enemy.update();
-            enemy.draw();
-        });
+        if (!this.gameOver) {
+            this.handleEnemies(dt);
+            this.enemies.forEach(enemy => {
+                enemy.update();
+                enemy.draw();
+            });
+        }
+
+        this.drawStatusText();
+    }
+
+    drawStatusText() {
+        this.context.save();
+
+        this.context.textAlign = "left";
+        this.context.fillText(`Score: ${this.score}`, 20, 40);
+
+        for (let i = 0; i < this.lives; i++) {
+            this.context.fillRect(20 + (15 * i), 60, 10, 30);
+        }
+
+        if (this.lives < 1 || this.score >= this.winningScore) {
+            this.triggerGameOver();
+        }
+
+        if (this.gameOver) {
+            this.context.textAlign = "center";
+            this.context.font = "80px Bangers";
+            
+            this.context.fillText(
+                this.message1,
+                this.width / 2.0,
+                this.height / 2.0 - 25
+            );
+
+            this.context.font = "20px Bangers";
+
+            this.context.fillText(
+                this.message2,
+                this.width / 2.0,
+                this.height / 2.0 + 25
+            );
+
+            this.context.fillText(
+                this.message3,
+                this.width / 2.0,
+                this.height / 2.0 + 50
+            );
+        }
+        
+        this.context.restore();
     }
 
 
@@ -127,6 +224,20 @@ class Game {
             rect1.y < rect2.y + rect2.height &&
             rect2.y < rect1.y + rect1.height
         );
+    }
+
+    triggerGameOver() {
+        if (!this.gameOver) {
+            this.gameOver = true;
+
+            this.message1 = "Aargh!";
+            this.message2 = "The crew was eaten!";
+
+            if (this.score >= this.winningScore) {
+                this.message1 = "Well done!";
+                this.message2 = "You escaped the swarm!";
+            }
+        }
     }
 }
 

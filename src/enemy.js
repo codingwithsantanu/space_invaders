@@ -48,6 +48,7 @@ class Enemy {
 
         if (this.y > this.game.height) {
             this.reset();
+            this.game.lives--;
         }
 
         // Check for collisions
@@ -59,6 +60,7 @@ class Enemy {
 
         if (!this.isAlive()) {
             this.reset();
+            this.game.score++;
         }
     }
 
