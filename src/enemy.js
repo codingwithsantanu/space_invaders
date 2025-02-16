@@ -44,7 +44,7 @@ class Enemy {
 
     
     // Main methods for managing enemies.
-    update() {
+    update(dt) {
         if (this.free)
             return;
 
@@ -62,7 +62,10 @@ class Enemy {
 
         if (this.y > this.game.height) {
             this.reset();
-            this.game.lives--;
+            if (!this.game.gameOver) {
+                this.game.lives--;
+                this.game.sound.scream.play();
+            }
         }
 
         if (!this.isAlive() && this.game.spriteUpdate) {
@@ -125,6 +128,69 @@ class Enemy {
             // this.reset();
         }
     }
+}
+
+
+// DIFFERENT ENEMY STATES.
+class EnemyState {
+    constructor(game, enemy) {
+        this.game = game;
+        this.enemy = enemy;
+    }
+}
+
+class Flying extends EnemyState {
+    start() {
+        this.enemy.minFrame = 0;
+        this.enemy.maxFrame = 2;
+        this.enemy.frameX = this.enemy.minFrame;
+
+        this.speedX = Math.random() * 2 - 1;
+        this.speedY = Math.random() * 0.5 + 0.2;
+    }
+
+    update() {
+        this.enemy.checkCollision();
+        this.enemy.handleAnimation();
+    }
+}
+
+class Plasing extends EnemyState {
+    start() {
+        this.enemy.minFrame = 3;
+        this.enemy.maxFrame = 5;
+        this.enemy.frameX = this.enemy.minFrame;
+
+        this.speedX = 0;
+        this.speedY = 2;
+    }
+
+    update() {
+        this.enemy.handleAnimation();
+        if (this.game.checkCollision(this.enemy, this.game.mouse) && this.game.mouse.pressed) {
+            this.enemy.y += 25;
+            this.game.sound.play(this.game.sound.slide);
+        }
+    }
+}
+
+class Imploding extends EnemyState {
+    start() {
+        this.enemy.minFrame = 6;
+        this.enemy.maxFrame = this.enemy.lastFrame;
+        this.enemy.frameX = this.enemy.minFrame;
+
+        this.game.sound.play(
+            this.game.sound.boomSounds[
+                Math.floor(Math.random() * 4)
+            ]
+        );
+    }
+
+    update() {}
+    // NOTE: When it is destroyed, the frames are handled
+    // ....  directly though generic Enemy class and there
+    // ....  is no need for detecting collisions.
 }
 
 
@@ -196,6 +262,87 @@ class LobsterMorph extends Enemy {
             if (this.frameX < this.maxFrame && this.game.spriteUpdate) {
                 this.frameX++;
             }
+        }
+    }
+}
+
+
+class PhantomMorph extends Enemy {
+    constructor(game) {
+        super(game);
+
+        this.image = document.getElementById("phantommorph");
+        
+        this.lastFrame = 14;
+
+        this.currentState;
+        this.states = [
+            new Flying(game, this),
+            new Plasing(game, this),
+            new Imploding(game, this)
+        ];
+
+        this.switchTimer = 0;
+        this.switchInterval = Math.random() * 2000 + 1000;
+    }
+    
+    start() {
+        super.start();
+        
+        this.lives = 1;
+        
+        const randomState = Math.floor(Math.random() * 2);
+        this.setState(randomState);
+    }
+
+    update(dt) {
+        super.update(dt);
+
+        if (this.free)
+            return;
+        
+        this.currentState.update();
+
+        if (this.x <= 0 || this.x >= this.game.width - this.width) {
+            this.speedX *= -1;
+        }
+
+        if (this.isAlive()) {
+            if (this.switchTimer < this.switchInterval) {
+                this.switchTimer += dt;
+            } else {
+                this.switchTimer = 0;
+                this.switch();
+            }
+        }
+    }
+
+    checkCollision() {
+        super.checkCollision();
+        if (!this.isAlive())
+            this.setState(2);
+    }
+
+    handleAnimation() {
+        if (this.game.spriteUpdate) {
+            if (this.frameX < this.maxFrame) {
+                this.frameX++;
+            } else {
+                this.frameX = this.minFrame;
+            }
+        }
+    }
+
+    setState(stateIndex) {
+        this.currentState = this.states[stateIndex];
+        this.currentState.start();
+    }
+
+    switch() {
+        if (this.currentState === this.states[0]) {
+            this.setState(1);
+        } else if (this.currentState === this.states[1]) {
+            this.setState(0);
         }
     }
 }

@@ -41,6 +41,8 @@ class Game {
         this.crewImage = document.getElementById("crewSprite");
         this.crewMembers = [];
 
+        this.sound = new AudioControl();
+
         // Add event listeners.
         this.mouse = {
             x: undefined,
@@ -112,6 +114,8 @@ class Game {
 
     // Main methods for handling the game mechanics.
     start() {
+        this.sound.newgame.play();
+        
         this.score = 0;
         this.lives = 5;
         this.gameOver = false;
@@ -153,7 +157,7 @@ class Game {
             this.handleEnemies(dt);
 
             for (let i = this.enemies.length - 1; i >= 0; i--) {
-                this.enemies[i].update();
+                this.enemies[i].update(dt);
             }
 
             this.enemies.forEach(enemy => {
@@ -228,12 +232,14 @@ class Game {
     // Helper methods for better modularity.
     createEnemies() {
         for (let i = 0; i < this.numberOfEnemies; i++) {
-            const randomNumber = Math.random();
-            if (randomNumber < 0.6) {
-                this.enemies.push(new BeetleMorph(this));
-            } else {
-                this.enemies.push(new LobsterMorph(this));
-            }
+            // const randomNumber = Math.random();
+            // if (randomNumber < 0.6) {
+                //     this.enemies.push(new BeetleMorph(this));
+            // } else {
+            //     this.enemies.push(new LobsterMorph(this));
+            // }
+
+            this.enemies.push(new PhantomMorph(this));
         }
     }
 
@@ -270,12 +276,14 @@ class Game {
         if (!this.gameOver) {
             this.gameOver = true;
 
-            this.message1 = "Aargh!";
-            this.message2 = "The crew was eaten!";
-
             if (this.score >= this.winningScore) {
                 this.message1 = "Well done!";
                 this.message2 = "You escaped the swarm!";
+                this.sound.win.play();
+            } else {
+                this.message1 = "Aargh!";
+                this.message2 = "The crew was eaten!";
+                this.sound.lose.play();
             }
         }
     }
