@@ -16,11 +16,51 @@ class Game {
         });
 
         this.enemies = [];
-        this.numberOfEnemies = 50;
+        this.numberOfEnemies = 10;
         this.createEnemies();
+
+        this.score;
+        this.lives;
 
         this.timer = 0;
         this.interval = 1000;
+
+        // Add event listeners.
+        this.mouse = {
+            x: undefined,
+            y: undefined,
+            width: 1,
+            height: 1,
+            pressed: false,
+            fired: false
+        }
+
+        window.addEventListener("mousedown", event => {
+            this.mouse.x = event.x;
+            this.mouse.y = event.y;
+            this.mouse.pressed = true;
+            this.mouse.fired = false;
+        });
+
+        window.addEventListener("mouseup", event => {
+            this.mouse.x = event.x;
+            this.mouse.y = event.y;
+            this.mouse.pressed = false;
+        });
+
+
+        window.addEventListener('touchstart', event => {
+            this.mouse.x = event.changedTouches[0].pageX;
+            this.mouse.y = event.changedTouches[0].pageY;
+            this.mouse.pressed = true;
+            this.mouse.fired = false;
+        });
+
+        window.addEventListener('touchend', event => {
+            this.mouse.x = event.changedTouches[0].pageX;
+            this.mouse.y = event.changedTouches[0].pageY;
+            this.mouse.pressed = false;
+        });
     }
 
     // Main methods for handling the game mechanics.
@@ -30,9 +70,21 @@ class Game {
 
         this.width = width;
         this.height = height;
+
+        this.score = 0;
+        this.lives = 3;
+
+        this.context.font = "50px Bangers";
+        this.context.textAlign = "center";  // Aligns text horizontally.
+        this.context.textBaseline = "middle"; // Aligns text vertically.
+        this.context.fillStyle = "White";
+        this.context.strokeStyle = "White";
+        this.context.lineWidth = 1;
     }
 
     render(dt) {
+        // console.log(this.mouse.pressed);
+
         this.handleEnemies(dt);
         this.enemies.forEach(enemy => {
             enemy.update();
@@ -57,7 +109,7 @@ class Game {
             const enemy = this.getFreeEnemy();
             if (enemy)
                 enemy.start();
-            console.log(enemy);
+            // console.log(enemy);
         }
     }
 
@@ -66,6 +118,15 @@ class Game {
             if (this.enemies[i].free)
                 return this.enemies[i];
         }
+    }
+
+    checkCollision(rect1, rect2) {
+        return (
+            rect1.x < rect2.x + rect2.width &&
+            rect2.x < rect1.x + rect1.width &&
+            rect1.y < rect2.y + rect2.height &&
+            rect2.y < rect1.y + rect1.height
+        );
     }
 }
 
